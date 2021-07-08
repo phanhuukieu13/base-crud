@@ -36,11 +36,14 @@
                             $i = 1;
                             @endphp
                             @foreach ($cate as $item)
+
                             <tbody>
                                 <tr class="format-table">
                                     <th scope="row">{{$i++}}</th>
                                     <td>{{ $item->category_name }}</td>
-                                    <td></td>
+                                    <td>
+                                            {{ $data }}
+                                    </td>
                                     @if($item->is_deleted == 0)
                                     <td>
                                         <span

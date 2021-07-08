@@ -17,6 +17,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function() {
         Route::post('update/{id}', 'UserController@update')->name('update');
 
         Route::post('destroy/{id}', 'UserController@destroy')->name('destroy');
+        Route::get('/search','UserController@search')->name('search');
 
     });
 

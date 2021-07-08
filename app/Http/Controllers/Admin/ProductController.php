@@ -50,6 +50,7 @@ class ProductController extends Controller
         $pd->detail = $request->detail;
         $pd->is_deleted = 0;
         $pd->save();
+        return redirect()->route('admin.pros.index');
     }
     public function edit($id){
         $products = Product::find($id);
