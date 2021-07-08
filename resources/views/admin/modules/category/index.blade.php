@@ -41,9 +41,7 @@
                                 <tr class="format-table">
                                     <th scope="row">{{$i++}}</th>
                                     <td>{{ $item->category_name }}</td>
-                                    <td>
-                                            {{ $data }}
-                                    </td>
+                                    <td>{{ $item->product()->count() }}</td>
                                     @if($item->is_deleted == 0)
                                     <td>
                                         <span

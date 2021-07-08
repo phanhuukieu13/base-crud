@@ -12,10 +12,12 @@ class CategoryController extends Controller
 {
     
     public function index(){
+        
         $cate = Category::all();
-        $idCate = Category::join('products','products.category_id','=','category.id')->select('category.id','products.category_id')->get();
-        $data = Product::where('category_id', $idCate)->get()->count();
-        return view('admin.modules.category.index',compact('cate','data'));
+        
+        $products = Product::all();
+
+        return view('admin.modules.category.index',compact('cate','products'));
     }
     public function create(){
         return view('admin.modules.category.create');
