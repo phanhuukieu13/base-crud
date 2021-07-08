@@ -1,0 +1,8 @@
+td.action-button {
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+tr.format-table {
+    text-align: center;
+}
