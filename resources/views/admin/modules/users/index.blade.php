@@ -44,7 +44,7 @@
                             @php
                             $i = 1;
                             @endphp
-                            @foreach ($user as $u )
+                            @foreach ($getUser as $u )
                             <tbody>
                                 <tr class="format-table">
                                     <th scope="row">{{ $i++ }}</th>
@@ -54,15 +54,21 @@
                                     <td>{{ $u->address }}</td>
                                     <td style="width: 10%;"><img style="width:80%"
                                             src="{{ asset('images/' . $u->image) }}" alt=""></td>
-                                    @if($u->is_deleted == 0)
-                                    <td>
-                                        <span
-                                            class="label label-inline label-light-primary font-weight-bold">Pending</span>
-                                    </td>
+                                    @if($u->status == 0)
+                                    <form action="{{ route('admin.users.deActive',['id' => $u->id]) }}" method="post">
+                                        @csrf
+                                        <td>
+                                            <button class="label label-inline label-light-primary ">Pending</button>
+                                        </td>
+                                    </form>
                                     @else
-                                    <td>
-                                        <span class="label label-lg label-light-danger label-inline">Rejected</span>
-                                    </td>
+                                    <form action="{{ route('admin.users.active',['id' => $u->id]) }}" method="post">
+                                        @csrf
+                                        <td>
+                                            <button
+                                                class="label label-lg label-light-danger label-inline">Rejected</button>
+                                        </td>
+                                    </form>
                                     @endif
                                     <td class="action-button">
                                         <a href="{{ route('admin.users.edit',['id' => $u->id]) }}"

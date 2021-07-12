@@ -10,7 +10,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function() {
         Route::get('/create','CategoryController@create')->name('create');
         Route::post('/store','CategoryController@store')->name('store');
         Route::get('/edit/{id}','CategoryController@edit')->name('edit');
-        Route::post('/update/{id}','CategoryController@update')->name('update');
+        Route::post('/update','CategoryController@update')->name('update');
         Route::post('/destroy/{id}','CategoryController@destroy')->name('destroy');
     });
 

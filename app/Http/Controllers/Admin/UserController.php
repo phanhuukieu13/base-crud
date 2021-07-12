@@ -13,9 +13,11 @@ use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
     public function index() {
-        $user = User::all();
+        $user = new User();
+        $getUser = $user->getUser();
+        $getUser = $getUser->get();
         $userLogin = LoginUser::all();
-        return view('admin.modules.users.index',compact('user','userLogin'));
+        return view('admin.modules.users.index',compact('getUser','userLogin'));
 
     }
 
@@ -24,15 +26,17 @@ class UserController extends Controller
     
     }
     public function search(Request $request) {
-        $user = User::all();
+        $user = new User();
+        $getUser = $user->getUser();
         if(!empty($request['search_name'])) {
             $searchName = $request['search_name'];
-            $user = DB::table('users')
+            $getUser = $getUser
                             ->where('full_name', 'like', "%$searchName%")
-                            ->orWhere('phone_number','like',"%$searchName%")
-                            ->get();
+                            ->orWhere('phone_number','like',"%$searchName%");
+                            
         }
-        return view('admin.modules.users.index',compact('user'));
+        $getUser = $getUser->get();
+        return view('admin.modules.users.index',compact('getUser'));
     }
     public function store(Request $request) {
         $dataSave = new User();
@@ -57,12 +61,15 @@ class UserController extends Controller
                     'password' =>  Hash::make($request->password),
                     'deleted_at' => carbon::now(),
                 ];
-                $dataSaveLogin = DB::table('login_user')->insert($dataSaveLogin);
+                $dataSaveLogin = DB::table('login_user')->save($dataSaveLogin);
             }
             return redirect()->route('admin.users.index');
     }
     public function edit($id) {
         $user = User::find($id);
+        if($user->is_deleted === 1){
+            return redirect()->route('admin.users.index');
+        }
         return view('admin.modules.users.edit',compact('user'));
     }
     public function update(Request $request, $id) {
@@ -88,6 +95,18 @@ class UserController extends Controller
     public function destroy($id) {
         $user =User::find($id);
         $user->is_deleted = 1;
+        $user->save();
+        return redirect()->route('admin.users.index');
+    }
+    public function deActive($id) {
+        $user =User::find($id);
+        $user->status = 1;
+        $user->save();
+        return redirect()->route('admin.users.index');
+    }
+    public function active($id) {
+        $user =User::find($id);
+        $user->status = 0;
         $user->save();
         return redirect()->route('admin.users.index');
     }

@@ -18,6 +18,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function() {
 
         Route::post('destroy/{id}', 'UserController@destroy')->name('destroy');
         Route::get('/search','UserController@search')->name('search');
+        Route::post('deActive/{id}', 'UserController@deActive')->name('deActive');
+        Route::post('active/{id}', 'UserController@active')->name('active');
 
     });
 

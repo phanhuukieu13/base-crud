@@ -9,6 +9,7 @@ class User extends Model
     protected $fillable = [
         'full_name', 'phone_number', 'image', 'address', 'old'
     ];
+  
    public function rules(){
        $rule = [
            'name' => 'required|min:1|max:255',
@@ -36,5 +37,15 @@ class User extends Model
             'old.max' => 'Tuổi không được quá 3 ký tự'
         ];
         return $messages;
+   }
+
+   public function getUser(){
+    $user = User::where('is_deleted','=', 0);
+    return $user;
+   }
+
+   public function getEdit(){
+        $user = User::select('User.*')->where('is_deleted','=', 0);
+        return $user;
    }
 }

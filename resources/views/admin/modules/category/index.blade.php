@@ -14,6 +14,10 @@
                     <div class="card-header">
                         <div class="card-title">
                             <h3 class="card-label">Danh mục sản phẩm</h3>
+                            <form class="col lg-6" action="{{ route('admin.cates.index')}}" method="get">
+                                <input value="{{ request()->input('search_name') }}" type="text" name="search_name" placeholder="Name" />
+                                <button type="submit" class="btn btn-info font-weight-bolder font-size-sm mr-3">Tìm kiếm</button>
+                            </form>
                         </div>
                         <div class="card-toolbar">
                             <a href="{{ route('admin.cates.create') }}"

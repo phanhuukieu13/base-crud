@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
@@ -39,36 +40,62 @@ class ProductController extends Controller
         return view('admin.modules.products.index',compact('products','viewCate'));
     }
     public function store(Request $request){
-        $data = $request->all();
+        $success = 0;
+        $errors = [];
         $pd = new Product();
-        $pd->category_id = $request->category_id;
-        $pd->name = $request->name;
-        $pd->color = $request->color;
-        $pd->size = $request->size;
-        $pd->amount = $request->amount;
-        $pd->price = $request->price;
-        $pd->detail = $request->detail;
-        $pd->is_deleted = 0;
-        $pd->save();
-        return redirect()->route('admin.pros.index');
+        $data = Validator::make($request->all(), $pd->rules(),$pd->messages());
+        if($data->fails()){
+            $dataError = $data->messages()->get('*');
+            foreach($dataError as $field => $error){
+                $errors[$field] = $dataError[$field][0];
+            }
+        }else{
+            $pd->category_id = $request->category_id;
+            $pd->name = $request->name;
+            $pd->color = $request->color;
+            $pd->size = $request->size;
+            $pd->amount = $request->amount;
+            $pd->price = $request->price;
+            $pd->detail = $request->detail;
+            $pd->is_deleted = 0;
+            $pd->save();
+        }
+        
+        return response()->json(['success'=>$success, 'error' => $errors]);
     }
     public function edit($id){
         $products = Product::find($id);
+        if($products->is_deleted === 1){
+            return redirect()->route('admin.users.index');
+        }
         $nameCate = Category::get();
         return view('admin.modules.products.edit',compact('products','nameCate'));    
     }
-    public function update(Request $request, $id){
+    public function update(Request $request){
+        $dataPost = $request->all();
+        $id = $dataPost['id'];
         $products = Product::find($id);
-        $products->category_id = $request->category_id;
-        $products->name = $request->name;
-        $products->color = $request->color;
-        $products->size = $request->size;
-        $products->amount = $request->amount;
-        $products->price = $request->price;
-        $products->detail = $request->detail;
-        $products->is_deleted = 0;
-        $products->update();
+        $success = 0;
+        $errors = [];
+        $data = Validator::make($request->all(),$products->rules(),$products->messages());
+        if($data->fails()){
+            $dataError = $data->messages()->get('*');
+            foreach($dataError as $field => $error){
+                    $errors[$field]= $dataError[$field][0];
+            }
+        }else{
+            $products->category_id = $request->category_id;
+            $products->name = $request->name;
+            $products->color = $request->color;
+            $products->size = $request->size;
+            $products->amount = $request->amount;
+            $products->price = $request->price;
+            $products->detail = $request->detail;
+            $products->is_deleted = 0;
+            $products->update();
+        }
         
+        return response()->json(['success'=>$success, 'error' => $errors]);
     }
     public function destroy($id){
         $data =Product::find($id);
