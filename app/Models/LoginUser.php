@@ -15,7 +15,7 @@ class LoginUser extends Authenticatable
     public function rules(){
         $rules = [
             'email' => 'required|max:255',
-            'password' => 'required|',
+            'password' => 'required|confirmed',
         ];
         return $rules;
     }
@@ -23,7 +23,8 @@ class LoginUser extends Authenticatable
         $messages = [
             'email.required' => 'Email không được để trống',
             'email.max' => 'Email không được quá 255 ký tự',
-            'password.required' => 'Mật khẩu không được để trống'
+            'password.required' => 'Mật khẩu không được để trống',
+            'password.confirmed' => 'abc'
         ];
     }
 }

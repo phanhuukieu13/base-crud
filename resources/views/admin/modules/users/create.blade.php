@@ -94,7 +94,6 @@
                 'password': $('password').val(),
                 'image': $('image').val(),
             }
-            console.log(data);
             $.ajax({
                 type: 'POST',
                 url: "{{ route('admin.users.store') }}",
