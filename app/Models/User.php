@@ -9,7 +9,7 @@ class User extends Model
     protected $fillable = [
         'full_name', 'phone_number', 'image', 'address', 'old'
     ];
-  
+
    public function rules(){
        $rule = [
            'name' => 'required|min:1|max:255',
@@ -41,6 +41,15 @@ class User extends Model
 
    public function getUser(){
     $user = User::where('is_deleted','=', 0);
+    return $user;
+   }
+
+   public function getUserById ($id) {
+    $user = User::where([
+        'id' => $id,
+        'is_deleted' => 0,
+    ])->first();
+
     return $user;
    }
 

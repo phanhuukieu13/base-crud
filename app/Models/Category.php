@@ -13,7 +13,7 @@ class Category extends Model
 
     public function product() {
 
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Product::class, 'category_id','id' );
 
     }
     public function rules(){
@@ -27,5 +27,12 @@ class Category extends Model
             'category_name.required' => 'Ten danh muc khong duoc de trong'
         ];
         return $messages;
+    }
+
+    public function getAllCategories() {
+        $categorios = Category::with(['product'])->where([
+            'is_deleted' => 0
+        ]);
+        return $categorios;
     }
 }

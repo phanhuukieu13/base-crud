@@ -14,7 +14,7 @@ class Product extends Model
         return $this->belongsTo(Category::class);
 
     }
-   
+
     public function rules() {
         $rules = [
             'category_id' => 'required',

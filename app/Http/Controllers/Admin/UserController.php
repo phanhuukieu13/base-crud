@@ -23,7 +23,7 @@ class UserController extends Controller
 
     public function create() {
         return view('admin.modules.users.create');
-    
+
     }
     public function search(Request $request) {
         $user = new User();
@@ -33,7 +33,7 @@ class UserController extends Controller
             $getUser = $getUser
                             ->where('full_name', 'like', "%$searchName%")
                             ->orWhere('phone_number','like',"%$searchName%");
-                            
+
         }
         $getUser = $getUser->get();
         return view('admin.modules.users.index',compact('getUser'));
@@ -66,8 +66,9 @@ class UserController extends Controller
             return redirect()->route('admin.users.index');
     }
     public function edit($id) {
-        $user = User::find($id);
-        if($user->is_deleted === 1){
+        $userModel = new User();
+        $user = $userModel->getUserById($id);
+        if(!$user){
             return redirect()->route('admin.users.index');
         }
         return view('admin.modules.users.edit',compact('user'));

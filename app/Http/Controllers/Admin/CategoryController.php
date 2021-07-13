@@ -10,17 +10,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator ;
 class CategoryController extends Controller
 {
-    
+
     public function index(Request $request){
-        
-        $cate = Category::all();
+
+        $catModel = new Category();
+        $cate = $catModel->getAllCategories();
         $products = Product::all();
         if(!empty($request['search_name'])) {
             $searchName = $request['search_name'];
-            $cate = DB::table('category')
-                            ->where('category_name', 'like', "%$searchName%")
-                            ->get();
+            $cate = $cate->where('category_name', 'like', "%$searchName%");
         }
+        $cate = $cate->get();
         return view('admin.modules.category.index',compact('cate','products'));
     }
     public function create(){
