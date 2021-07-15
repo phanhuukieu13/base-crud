@@ -101,4 +101,12 @@ class CategoryController extends Controller
         $cate->save();
         return redirect()->route('admin.cates.index');
     }
+    public function deleteMultiple(Request $request){
+        $data = $request->all();
+        $ids =json_decode($data['id']);
+        foreach($ids as $cates){
+             Category::whereIn('id',explode(",",$cates))->update(['is_deleted'=> 1]);
+        }
+        return response()->json(['status'=>true,'message'=>"Cate deleted successfully."]);
+    }
 }

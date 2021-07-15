@@ -18,8 +18,9 @@
                                 <input value="{{ request()->input('search_name') }}" type="text" name="search_name" placeholder="Name" />
                                 <select name="search_status" class="form-control">
                                     <option value="">Chọn</option>
-                                    <option value="1">Pending</option>
-                                    <option value="2">Rejected</option>
+                                    @foreach(config('common.status') as $key => $value)
+                                    <option value="{{ $key }}"> {{ $value }}</option>
+                                    @endforeach
                                 </select>
                                 <button type="submit" class="btn btn-info font-weight-bolder font-size-sm mr-3">Tìm kiếm</button>
                             </form>
@@ -29,11 +30,14 @@
                                 class="btn btn-info font-weight-bolder font-size-sm mr-3">Thêm danh mục</a>
                         </div>
                     </div>
+                    <button style="margin: 5px;" class="btn btn-danger btn-xs delete-all" data-url="">Delete
+                        All</button>
                     <div class="card-body">
                         <!--begin::Example-->
                         <table class="table">
                             <thead>
                                 <tr class="format-table">
+                                    <th><input type="checkbox" id="check_all"></th>
                                     <th scope="col">STT</th>
                                     <th scope="col">Tên danh mục</th>
                                     <td scope="col">Tổng sản phẩm</td>
@@ -47,7 +51,8 @@
                             @foreach ($cate as $item)
 
                             <tbody>
-                                <tr class="format-table">
+                                <tr id="tr_{{$item->id}}"  class="format-table">
+                                    <td><input type="checkbox" class="checkbox" data-id="{{$item->id}}"></td>
                                     <th scope="row">{{$i++}}</th>
                                     <td>{{ $item->category_name }}</td>
                                     <td>{{ $item->product()->count() }}</td>
@@ -119,4 +124,70 @@
         </div>
     </div>
 </div>
+@endsection
+@section('script')
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#check_all').on('click', function(e) {
+         if($(this).is(':checked',true))  
+         {
+            $(".checkbox").prop('checked', true);  
+         } else {  
+            $(".checkbox").prop('checked',false);  
+         }  
+        });
+         $('.checkbox').on('click',function(){
+            if($('.checkbox:checked').length == $('.checkbox').length){
+                $('#check_all').prop('checked',true);
+            }else{
+                $('#check_all').prop('checked',false);
+            }
+         });
+        $('.delete-all').on('click', function(e) {
+            var idsArr = [];  
+            $(".checkbox:checked").each(function() {  
+                idsArr.push($(this).attr('data-id'));
+            });  
+
+            if(idsArr.length <=0)  
+            {  
+                alert("Please select atleast one record to delete.");  
+            }  else {  
+                if(confirm("Ban chac chan muon xoa het tat ca ?")){  
+                    var strIds = JSON.stringify(idsArr)
+                    //  console.log(strIds)
+                    //  console.log(JSON.parse(strIds))
+                    $.ajax({
+                        url: "{{ route('admin.cates.deleteAll') }}",
+                        type: 'post',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                        data: {'id' : strIds},
+                        success: function (data) {
+                            if (data['status']==true) {
+                                $(".checkbox:checked").each(function() {  
+                                    $(this).parents("tr").remove();
+                                });
+                                alert(data['message']);
+                            } else {
+                                alert('Whoops Something went wrong!!');
+                            }
+                        },
+                        error: function (data) {
+                            alert(data.responseText);
+                        }
+                    });
+                }  
+            }  
+        });
+        // $('[data-toggle=confirmation]').confirmation({
+        //     rootSelector: '[data-toggle=confirmation]',
+        //     onConfirm: function (event, element) {
+        //         element.closest('form').submit();
+        //     }
+        // });   
+    
+    });
+</script>
 @endsection

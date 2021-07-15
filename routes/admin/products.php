@@ -15,6 +15,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.' ,'middleware'=> 'checklogin:
         Route::get('/search','ProductController@search')->name('search');
         Route::post('DeActive/{id}', 'ProductController@DeActive')->name('DeActive');
         Route::post('active/{id}', 'ProductController@Active')->name('active');
+        Route::post('deleteAll', 'ProductController@deleteMultiple')->name('deleteAll');
     });
 
 });

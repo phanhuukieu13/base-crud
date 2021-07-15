@@ -133,4 +133,12 @@ class ProductController extends Controller
         $data->save();
         return redirect()->route('admin.pros.index');
     }
+    public function deleteMultiple(Request $request){
+        $data = $request->all();
+        $ids =json_decode($data['id']);
+        foreach($ids as $pros){
+             Product::whereIn('id',explode(",",$pros))->update(['is_deleted'=> 1]);
+        }
+        return response()->json(['status'=>true,'message'=>"User deleted successfully."]);
+    }
 }

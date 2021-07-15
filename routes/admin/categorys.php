@@ -14,6 +14,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.' ,'middleware'=> 'checklogin:
         Route::post('/destroy/{id}','CategoryController@destroy')->name('destroy');
         Route::post('deActive/{id}', 'CategoryController@deActive')->name('deActive');
         Route::post('active/{id}', 'CategoryController@Active')->name('active');
+        Route::post('deleteAll', 'CategoryController@deleteMultiple')->name('deleteAll');
     });
 
 });

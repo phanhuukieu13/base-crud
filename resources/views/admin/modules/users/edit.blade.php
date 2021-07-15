@@ -48,8 +48,7 @@
                                         <label>Ảnh</label>
                                         <input class="form-control" type="file"  id="image" accept="image/png, image/jpeg">
                                         <br>
-                                        <img src="" id="profile-img-tag" width="200px" />
-                                        <img style="width:80%" src="{{ asset('public/img/' . $user->image) }}" alt="">
+                                        <img id="profile-img-tag" style="width:80%" src="{{ asset('public/img/' . $user->image) }}" alt="">
                                         <input multipart type="hidden" value="{{ $user->image }}" name='image' id="file_name">
                                         <p class="error-message text-danger" id="err-image"></p>
                                     </div>

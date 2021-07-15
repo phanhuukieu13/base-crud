@@ -17,27 +17,35 @@
                             <form class="col lg-6" action="{{ route('admin.users.search')}}" method="get">
                                 <input value="{{ request()->input('search_name') }}" type="text" class=""
                                     name="search_name" placeholder="Name" />
-                                    <input value="{{ request()->input('phone_number') }}" type="text" class=""
+                                <input value="{{ request()->input('phone_number') }}" type="text" class=""
                                     name="phone_number" placeholder="Số điện thoại" />
-                                    <select name="search_status" class="form-control">
-                                        <option value="">Chọn</option>
-                                        <option value="1">Pending</option>
-                                        <option value="2">Rejected</option>
-                                    </select>
+                                <select name="search_status" class="form-control">
+                                    <option value="">Chọn</option>
+                                    @foreach(config('common.status') as $key => $value)
+                                   <option value="{{ $key }}"> {{ $value }}</option>
+                                   @endforeach
+                                </select>
+                                
                                 <button type="submit" class="btn btn-info font-weight-bolder font-size-sm mr-3">Tìm
                                     kiếm</button>
                             </form>
                         </div>
+
                         <div class="card-toolbar">
+
                             <a href="{{ route('admin.users.create') }}"
                                 class="btn btn-info font-weight-bolder font-size-sm mr-3">Thêm người dùng</a>
                         </div>
                     </div>
+                    
+                    <button style="margin: 5px;" class="btn btn-danger btn-xs delete-all" data-url="">Delete
+                        All</button>
                     <div class="card-body">
                         <!--begin::Example-->
                         <table class="table">
                             <thead>
                                 <tr class="format-table">
+                                    <th><input type="checkbox" id="check_all"></th>
                                     <th scope="col">STT</th>
                                     <th scope="col">Họ và tên</th>
                                     <th scope="col">Số điện thoại</th>
@@ -51,9 +59,11 @@
                             @php
                             $i = 1;
                             @endphp
+                            @if($getUser->count())
                             @foreach ($getUser as $u )
                             <tbody>
-                                <tr class="format-table">
+                                <tr id="tr_{{$u->id}}" class="format-table">
+                                    <td><input type="checkbox" class="checkbox" data-id="{{$u->id}}"></td>
                                     <th scope="row">{{ $i++ }}</th>
                                     <td>{{ $u->full_name }}</td>
                                     <td>{{ $u->phone_number }}</td>
@@ -72,13 +82,13 @@
                                     <form action="{{ route('admin.users.active',['id' => $u->id]) }}" method="post">
                                         @csrf
                                         <td>
-                                            <button
+                                            <button type="submit" name="submit"
                                                 class="label label-lg label-light-danger label-inline">Rejected</button>
                                         </td>
                                     </form>
                                     @endif
                                     <td class="action-button">
-                                        <a href="{{ route('admin.users.edit',['id' => $u->id]) }}"
+                                        <a href="{{ route('admin.users.edit',['id' => $u->id]) }}" 
                                             class="btn btn-icon btn-light btn-hover-primary btn-sm mx-3">
                                             <span class="svg-icon svg-icon-md svg-icon-primary">
                                                 <svg xmlns="http://www.w3.org/2000/svg"
@@ -123,10 +133,12 @@
                                                 </span>
                                                 </a>
                                         </form>
+
                                     </td>
                                 </tr>
                             </tbody>
                             @endforeach
+                            @endif
                         </table>
                         <!--end::Example-->
                     </div>
@@ -135,4 +147,90 @@
         </div>
     </div>
 </div>
+@endsection
+@section('script')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#check_all').on('click', function(e) {
+         if($(this).is(':checked',true))  
+         {
+            $(".checkbox").prop('checked', true);  
+         } else {  
+            $(".checkbox").prop('checked',false);  
+         }  
+        });
+         $('.checkbox').on('click',function(){
+            if($('.checkbox:checked').length == $('.checkbox').length){
+                $('#check_all').prop('checked',true);
+            }else{
+                $('#check_all').prop('checked',false);
+            }
+         });
+        $('.delete-all').on('click', function(e) {
+            var idsArr = [];  
+            $(".checkbox:checked").each(function() {  
+                idsArr.push($(this).attr('data-id'));
+            });  
+
+            if(idsArr.length <=0)  
+            {  
+                alert("Please select atleast one record to delete.");  
+            }  else {  
+                if(confirm("Ban chac chan muon xoa het tat ca ?")){  
+                    var strIds = JSON.stringify(idsArr)
+                    //  console.log(strIds)
+                    //  console.log(JSON.parse(strIds))
+                    $.ajax({
+                        url: "{{ route('admin.users.deleteAll') }}",
+                        type: 'post',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                        data: {'id' : strIds},
+                        success: function (data) {
+                            if (data['status']==true) {
+                                $(".checkbox:checked").each(function() {  
+                                    $(this).parents("tr").remove();
+                                });
+                                alert(data['message']);
+                            } else {
+                                alert('Whoops Something went wrong!!');
+                            }
+                        },
+                        error: function (data) {
+                            alert(data.responseText);
+                        }
+                    });
+                }  
+            }  
+        });
+        // $('[data-toggle=confirmation]').confirmation({
+        //     rootSelector: '[data-toggle=confirmation]',
+        //     onConfirm: function (event, element) {
+        //         element.closest('form').submit();
+        //     }
+        // });   
+    
+    });
+    $(".btn").click(function(){
+    var id = $(this).data('id');
+
+   // var $tr = $(this).closest('tr');
+    $.ajax({
+                url: "/admin/user/destroy"+id,
+                dataType: "JSON",
+                type: 'POST',
+                data: {
+                    '_token': $('meta[name=csrf-token]').attr("content"),
+                     "id": id
+                },
+                success: function ()
+                {
+                    console.log("it Work");
+                }
+            });
+    console.log("It failed");
+});
+</script>
 @endsection

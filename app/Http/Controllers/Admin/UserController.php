@@ -85,7 +85,7 @@ class UserController extends Controller
                         'status' => 1,
                         'is_deleted' => 0,
                         'password' =>  Hash::make($request->password),
-                        'deleted_at' => Carbon::now(),
+                       
                     ];
                     $dataSaveLogin = DB::table('login_user')->insert($dataSaveLogin);
                 }
@@ -104,6 +104,7 @@ class UserController extends Controller
         if(!$user){
             return redirect()->route('admin.users.index');
         }
+        
         return view('admin.modules.users.edit',compact('user'));
     }
     public function update(Request $request) {
@@ -111,6 +112,7 @@ class UserController extends Controller
         $data = $request->all();
         $id = $data['id'];
         $user = $userModel->getUserById($id);
+        $oldImage = $user['image'];
         $fileName = $data['image'];
         $errors = [];
         $success = 0;
@@ -125,16 +127,20 @@ class UserController extends Controller
                 $user->phone_number = $data['phone_number'];
                 $user->address = $data['address'];
                 $user->old = $data['old'];
-                $user->image = $fileName;
-                $user->update();
-                if ($user->update()) {
-                    if ($fileName !=null){} {
-                        $tmp = $_SERVER['DOCUMENT_ROOT'] . '/public/tmp/' . $fileName;
-                        $saveFile = $_SERVER['DOCUMENT_ROOT'] . '/public/img/' . $fileName;
-                        rename($tmp, $saveFile);
+                if($fileName == $oldImage){
+                    $user->image = $oldImage;
+                }else{
+                    $user->image = $fileName;
+                    if ($user->update()) {
+                        if($fileName !=null){} {
+                            $tmp = $_SERVER['DOCUMENT_ROOT'] . '/public/tmp/' . $fileName;
+                            $saveFile = $_SERVER['DOCUMENT_ROOT'] . '/public/img/' . $fileName;
+                            rename($tmp, $saveFile);
+                        }
+                        
                     }
                 }
-
+                $user->update();
             }
         $success = 1;
         if (empty($errors)) {
@@ -152,7 +158,9 @@ class UserController extends Controller
             $user->deleted_at = Carbon::now('Asia/Ho_Chi_Minh');
             $user->save();
         }
-        return redirect()->route('admin.users.index');
+        return response()->json([
+            'success' => 'Record deleted successfully!'
+        ]);
     }
     public function deActive($id) {
         $userModel = new User();
@@ -175,5 +183,13 @@ class UserController extends Controller
             $user->save();  
         }
         return redirect()->route('admin.users.index');
+    }
+    public function deleteMultiple(Request $request){
+        $data = $request->all();
+        $ids =json_decode($data['id']);
+        foreach($ids as $user){
+             User::whereIn('id',explode(",",$user))->update(['is_deleted'=> 1]);
+        }
+        return response()->json(['status'=>true,'message'=>"User deleted successfully."]);
     }
 }
