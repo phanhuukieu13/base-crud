@@ -13,6 +13,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.' ,'middleware'=> 'checklogin:
         Route::post('/update','ProductController@update')->name('update');
         Route::post('/destroy/{id}','ProductController@destroy')->name('destroy');
         Route::get('/search','ProductController@search')->name('search');
+        Route::post('DeActive/{id}', 'ProductController@DeActive')->name('DeActive');
+        Route::post('active/{id}', 'ProductController@Active')->name('active');
     });
 
 });

@@ -94,6 +94,7 @@
     $(document).ready(function() {
             $(".btn-submit").click(function(e){
             e.preventDefault();
+            //click submit gửi datt
 
             var data ={
                category_id: $(".category_id").val(),
@@ -104,21 +105,22 @@
                price: $(".price").val(),
                detail: $(".detail").val(),
             } 
+            // láy dữ liệu từ clas input
             $.ajax({
-                url: "{{ route('admin.pros.store') }}",
-                type:'POST',
-                data:data,
-                dataType:'json',
+                url: "{{ route('admin.pros.store') }}", //route thêm
+                type:'POST', // kiểu post
+                data:data, // dữ liệu gửi lên
+                dataType:'json', // dưới dang json
                 headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}' // = @csrf
                 },
                 success: function (response) {
                 console.log(response.success)
                 if (response.success == 1) {
-                    window.location.href = "{{route('admin.pros.index')}}";
+                    window.location.href = "{{route('admin.pros.index')}}";  //khi thêm thành công
                 } else {
                     if (response.error) {
-                        $.each(response.error, function (key, value) {
+                        $.each(response.error, function (key, value) { // thêm sai in ra lỗi 
                             var idElement = '#err-' + key
                             $(idElement).html(value)
                         });

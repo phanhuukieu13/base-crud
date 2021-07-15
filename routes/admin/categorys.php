@@ -12,6 +12,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.' ,'middleware'=> 'checklogin:
         Route::get('/edit/{id}','CategoryController@edit')->name('edit');
         Route::post('/update','CategoryController@update')->name('update');
         Route::post('/destroy/{id}','CategoryController@destroy')->name('destroy');
+        Route::post('deActive/{id}', 'CategoryController@deActive')->name('deActive');
+        Route::post('active/{id}', 'CategoryController@Active')->name('active');
     });
 
 });

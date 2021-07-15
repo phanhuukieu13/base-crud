@@ -9,12 +9,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.' ,'middleware'=> 'checklogin:
         Route::get('/','UserController@index')->name('index');
 
         Route::get('/create','UserController@create')->name('create');
-
+        Route::post('/uploadFile', 'UserController@uploadFile')->name('uploadFile');
         Route::post('/store', 'UserController@store')->name('store');
         
         Route::get('/edit/{id}','UserController@edit')->name('edit');
 
-        Route::post('update/{id}', 'UserController@update')->name('update');
+        Route::post('update', 'UserController@update')->name('update');
 
         Route::post('destroy/{id}', 'UserController@destroy')->name('destroy');
         Route::get('/search','UserController@search')->name('search');

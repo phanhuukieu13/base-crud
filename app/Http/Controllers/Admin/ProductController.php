@@ -6,37 +6,47 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
     public function index(){
-        $products = Product::get();
-        $viewCate = Category::get();
+        $productsModel = new Product();
+        $products = $productsModel->getProduct();
+        $products = $products->get();
+        $cateModel = new Category();
+        $viewCate = $cateModel->getCategory();
+        $viewCate = $cateModel->get();
         return view('admin.modules.products.index',compact('products','viewCate'));
     }
     public function create(){
-        $cateName = DB::table('category')->get();
+        $cateModel = new Category();
+        $cateName = $cateModel->getCategory()->get();
         return view('admin.modules.products.create',compact('cateName'));
     }
     public function search(Request $request){
-        $viewCate = Category::get();
-        $products =Product::get();
-        if(!empty($request['search_category'])) {
-            $searchName = $request['search_category'];
-            $products = DB::table('products')
-                            ->where('category_id', 'like', "%$searchName%")
-                            ->get();
+        $productsModel = new Product();
+        $cateModel = new Category();
+        $viewCate = $cateModel->getCategory()->get();
+        $products = $productsModel->getProduct();
 
+        if(!empty($request['search_category'])) {
+            $searchCate = $request['search_category'];
+            $products = $products->where('category_id', 'like', "%$searchCate%");
         }
+
         if(!empty($request['search_name'])) {
             $searchName = $request['search_name'];
-            $products = DB::table('products')
-                            ->where('name', 'like', "%$searchName%")
-                            ->get();
+            $products = $products->where('name', 'like', "%$searchName%");
         }
-        
+
+        if(!empty($request['search_status'])){
+            $searchStatus = $request['search_status'];
+            $products = $products->where('status','like',"%$searchStatus%");
+        }
+        $products  = $products->get();
         return view('admin.modules.products.index',compact('products','viewCate'));
     }
     public function store(Request $request){
@@ -58,23 +68,28 @@ class ProductController extends Controller
             $pd->price = $request->price;
             $pd->detail = $request->detail;
             $pd->is_deleted = 0;
+            $pd->status = 1;
             $pd->save();
         }
         
         return response()->json(['success'=>$success, 'error' => $errors]);
     }
     public function edit($id){
-        $products = Product::find($id);
-        if($products->is_deleted === 1){
+        $productsModel = new Product();
+        $products = $productsModel->getProsById($id);
+        $cate = new Category();
+        $nameCate = $cate->getCategory()->get();
+        if(!$products){
             return redirect()->route('admin.users.index');
         }
-        $nameCate = Category::get();
+      
         return view('admin.modules.products.edit',compact('products','nameCate'));    
     }
     public function update(Request $request){
         $dataPost = $request->all();
         $id = $dataPost['id'];
-        $products = Product::find($id);
+        $productsModel = new Product();
+        $products = $productsModel->getProsById ($id);
         $success = 0;
         $errors = [];
         $data = Validator::make($request->all(),$products->rules(),$products->messages());
@@ -94,12 +109,27 @@ class ProductController extends Controller
             $products->is_deleted = 0;
             $products->update();
         }
-        
         return response()->json(['success'=>$success, 'error' => $errors]);
     }
     public function destroy($id){
-        $data =Product::find($id);
+        $dataModel = new Product();
+        $data =$dataModel->getProsById ($id);
         $data->is_deleted = 1;
+        $data->deleted_at = Carbon::now('Asia/Ho_Chi_Minh');
+        $data->save();
+        return redirect()->route('admin.pros.index');
+    }
+    public function Active($id){
+        $dataModel = new Product();
+        $data = $dataModel->getProsById ($id);
+        $data->status = 1;
+        $data->save();
+        return redirect()->route('admin.pros.index');
+    }
+    public function DeActive($id){
+        $dataModel = new Product();
+        $data = $dataModel->getProsById ($id);
+        $data->status = 2;
         $data->save();
         return redirect()->route('admin.pros.index');
     }

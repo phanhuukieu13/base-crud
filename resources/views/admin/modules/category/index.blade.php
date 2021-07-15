@@ -1,7 +1,7 @@
 @extends('admin.layouts.layout')
 @section('title', 'Danh mục sản phẩm')
 @section('content')
-
+@include('sweetalert::alert')
 <!--begin::Entry-->
 <div class="d-flex flex-column-fluid">
     <!--begin::Container-->
@@ -16,6 +16,11 @@
                             <h3 class="card-label">Danh mục sản phẩm</h3>
                             <form class="col lg-6" action="{{ route('admin.cates.index')}}" method="get">
                                 <input value="{{ request()->input('search_name') }}" type="text" name="search_name" placeholder="Name" />
+                                <select name="search_status" class="form-control">
+                                    <option value="">Chọn</option>
+                                    <option value="1">Pending</option>
+                                    <option value="2">Rejected</option>
+                                </select>
                                 <button type="submit" class="btn btn-info font-weight-bolder font-size-sm mr-3">Tìm kiếm</button>
                             </form>
                         </div>
@@ -46,15 +51,21 @@
                                     <th scope="row">{{$i++}}</th>
                                     <td>{{ $item->category_name }}</td>
                                     <td>{{ $item->product()->count() }}</td>
-                                    @if($item->is_deleted == 0)
-                                    <td>
-                                        <span
-                                            class="label label-inline label-light-primary font-weight-bold">Pending</span>
-                                    </td>
-                                    @else
-                                    <td>
-                                        <span class="label label-lg label-light-danger label-inline">Rejected</span>
-                                    </td>
+                                    @if($item->status == 1)
+                                    <form action="{{ route('admin.cates.deActive',['id' => $item->id]) }}" method="post">
+                                        @csrf
+                                        <td>
+                                            <button class="label label-inline label-light-primary ">Pending</button>
+                                        </td>
+                                    </form>
+                                    @elseif($item->status == 2)
+                                    <form action="{{ route('admin.cates.active',['id' => $item->id]) }}" method="post">
+                                        @csrf
+                                        <td>
+                                            <button
+                                                class="label label-lg label-light-danger label-inline">Rejected</button>
+                                        </td>
+                                    </form>
                                     @endif
                                     <td class="action-button">
                                         <a href="{{ route('admin.cates.edit',['id' => $item->id]) }}"

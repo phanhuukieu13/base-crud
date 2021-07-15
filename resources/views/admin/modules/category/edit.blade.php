@@ -54,7 +54,6 @@
                 'id_cate': $("#id_cate").val(),
                 'category_name': $("#category_name").val(),
             }
-            console.log(data);
             const routes = route('admin.cates.update')
             $.ajax({
             type: 'POST',

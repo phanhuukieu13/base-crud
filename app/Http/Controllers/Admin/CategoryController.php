@@ -6,19 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator ;
 class CategoryController extends Controller
 {
 
     public function index(Request $request){
-
         $catModel = new Category();
         $cate = $catModel->getAllCategories();
-        $products = Product::all();
+        $productsModel = new Product();
+        $products = $productsModel->getProduct()->get();
         if(!empty($request['search_name'])) {
             $searchName = $request['search_name'];
             $cate = $cate->where('category_name', 'like', "%$searchName%");
+        }
+        if(!empty($request['search_status'])) {
+            $searchName = $request['search_status'];
+            $cate = $cate->where('status', 'like', "%$searchName%");
         }
         $cate = $cate->get();
         return view('admin.modules.category.index',compact('cate','products'));
@@ -42,16 +46,17 @@ class CategoryController extends Controller
             $dataSave->is_deleted = 0;
             $dataSave->save();
         }
-         $request->session()->flash('status', 'Tạo danh muc thành công!');
         return response()->json(['success'=>$success, 'error' => $errors]);
     }
     public function edit($id){
-        $cate = Category::find($id);
-        $products = Product::find($id);
-        if($cate->is_deleted === 1){
-            return redirect()->route('admin.users.index');
-        }elseif($products->id_deleted === 1){
-            return redirect()->route('admin.users.index');
+        $cateModel = new Category();
+        $cate = $cateModel->getCatesById($id);
+        $productsModel = new Product();
+        $products = $productsModel->getProsById ($id);
+        if(!$cate){
+            return redirect()->route('admin.cates.index');
+        }elseif($products){
+            return redirect()->route('admin.cates.index');
         }
         return view('admin.modules.category.edit',compact('cate'));
     }
@@ -78,6 +83,22 @@ class CategoryController extends Controller
     public function destroy($id){
         $cate = Category::find($id);
         $cate->is_deleted = 1;
+        $cate->deleted_at = Carbon::now();
         $cate->save();
+    }
+    public function active($id){
+        $cateModel = new Category();
+        $cate= $cateModel->getCatesById ($id);
+        $cate->status = 0;
+        $cate->save();
+        return redirect()->route('admin.cates.index');
+    }
+    public function deActive($id) {
+        $cateModel = new Category();
+        $cate = $cateModel->getCatesById ($id);
+        
+        $cate->status = 1;
+        $cate->save();
+        return redirect()->route('admin.cates.index');
     }
 }

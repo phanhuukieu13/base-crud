@@ -29,10 +29,23 @@ class Category extends Model
         return $messages;
     }
 
+    public function getCategory(){
+        $category = Category::where('is_deleted' ,'=', 0);
+        return $category;
+    }
+    public function getCatesById ($id) {
+        $cates = Category::where([
+            'id' => $id,
+            'is_deleted' => 0,
+        ])->first();
+    
+        return $cates;
+       }
     public function getAllCategories() {
         $categorios = Category::with(['product'])->where([
             'is_deleted' => 0
         ]);
         return $categorios;
     }
+
 }

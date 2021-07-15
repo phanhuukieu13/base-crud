@@ -17,6 +17,13 @@
                             <form class="col lg-6" action="{{ route('admin.users.search')}}" method="get">
                                 <input value="{{ request()->input('search_name') }}" type="text" class=""
                                     name="search_name" placeholder="Name" />
+                                    <input value="{{ request()->input('phone_number') }}" type="text" class=""
+                                    name="phone_number" placeholder="Số điện thoại" />
+                                    <select name="search_status" class="form-control">
+                                        <option value="">Chọn</option>
+                                        <option value="1">Pending</option>
+                                        <option value="2">Rejected</option>
+                                    </select>
                                 <button type="submit" class="btn btn-info font-weight-bolder font-size-sm mr-3">Tìm
                                     kiếm</button>
                             </form>
@@ -53,15 +60,15 @@
                                     <td>{{ $u->old }}</td>
                                     <td>{{ $u->address }}</td>
                                     <td style="width: 10%;"><img style="width:80%"
-                                            src="{{ asset('images/' . $u->image) }}" alt=""></td>
-                                    @if($u->status == 0)
+                                            src="{{ asset('public/img/' . $u->image) }}" alt=""></td>
+                                    @if($u->status == 1)
                                     <form action="{{ route('admin.users.deActive',['id' => $u->id]) }}" method="post">
                                         @csrf
                                         <td>
                                             <button class="label label-inline label-light-primary ">Pending</button>
                                         </td>
                                     </form>
-                                    @else
+                                    @elseif($u->status == 2)
                                     <form action="{{ route('admin.users.active',['id' => $u->id]) }}" method="post">
                                         @csrf
                                         <td>

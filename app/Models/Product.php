@@ -42,4 +42,16 @@ class Product extends Model
         ];
         return $messages;
     }
+    public function getProduct(){
+        $product = Product::where('is_deleted','=',0);
+        return $product;
+    }
+    public function getProsById ($id) {
+        $pros = Product::where([
+            'id' => $id,
+            'is_deleted' => 0,
+        ])->first();
+    
+        return $pros;
+       }
 }

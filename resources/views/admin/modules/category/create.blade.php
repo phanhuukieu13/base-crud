@@ -25,7 +25,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary ml-4 btn-submit">Submit</button>
+                            <button type="button" class="btn btn-primary ml-4 btn-submit">Submit</button>
                             <button type="button" class="btn btn-secondary ml-2 cancel">Cancel</button>
                         </div>
                         @if (session('status'))
@@ -50,7 +50,6 @@
     $(document).ready(function () {
         $(".btn-submit").click(function (e) {
             e.preventDefault();
-
             var category_name = $("#category_name").val();
 
             $.ajax({

@@ -17,10 +17,16 @@
                             <form class="col lg-6" action="{{ route('admin.pros.search')}}" method="get">
                                 <select name="search_category" class="form-control">
                                     @foreach ($viewCate as $item)
+                                    <option value="">Chọn</option>
                                     <option value="{{$item->id}}">{{$item->category_name}}
                                     </option>
                                     @endforeach
                                 
+                                </select>
+                                <select name="search_status" class="form-control">
+                                    <option value="">Chọn</option>
+                                    <option value="1">Pending</option>
+                                    <option value="2">Rejected</option>
                                 </select>
                                 <input value="{{ request()->input('search_name') }}" type="text" class=""name="search_name" placeholder="Name" />
                                 <button type="submit" class="btn btn-info font-weight-bolder font-size-sm mr-3">Tìm
@@ -61,15 +67,21 @@
                                     <td>{{ $item->amount }}</td>
                                     <td>{{ $item->price }}</td>
                                     <td>{{ $item->detail }}</td>
-                                    @if($item->is_deleted == 0)
-                                    <td>
-                                        <span
-                                            class="label label-inline label-light-primary font-weight-bold">Pending</span>
-                                    </td>
-                                    @else
-                                    <td>
-                                        <span class="label label-lg label-light-danger label-inline">Rejected</span>
-                                    </td>
+                                    @if($item->status == 1)
+                                    <form action="{{ route('admin.pros.DeActive',['id' => $item->id]) }}" method="post">
+                                        @csrf
+                                        <td>
+                                            <button class="label label-inline label-light-primary ">Pending</button>
+                                        </td>
+                                    </form>
+                                    @elseif($item->status ==2)
+                                    <form action="{{ route('admin.pros.active',['id' => $item->id]) }}" method="post">
+                                        @csrf
+                                        <td>
+                                            <button
+                                                class="label label-lg label-light-danger label-inline">Rejected</button>
+                                        </td>
+                                    </form>
                                     @endif
                                     <td class="action-button">
                                         <a href="{{ route('admin.pros.edit',['id'=>$item->id]) }}"
