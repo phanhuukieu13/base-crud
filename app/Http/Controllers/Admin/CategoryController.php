@@ -15,7 +15,7 @@ class CategoryController extends Controller
         $catModel = new Category();
         $cate = $catModel->getAllCategories();
         $productsModel = new Product();
-        $products = $productsModel->getProduct()->get();
+        $products = $productsModel->getProduct()->paginate(5);
         if(!empty($request['search_name'])) {
             $searchName = $request['search_name'];
             $cate = $cate->where('category_name', 'like', "%$searchName%");
@@ -24,7 +24,7 @@ class CategoryController extends Controller
             $searchName = $request['search_status'];
             $cate = $cate->where('status', 'like', "%$searchName%");
         }
-        $cate = $cate->get();
+        $cate = $cate->paginate(5);
         return view('admin.modules.category.index',compact('cate','products'));
     }
     public function create(){
@@ -95,11 +95,21 @@ class CategoryController extends Controller
     }
     public function deActive($id) {
         $cateModel = new Category();
-        $cate = $cateModel->getCatesById ($id);
-        
-        $cate->status = 1;
-        $cate->save();
-        return redirect()->route('admin.cates.index');
+        $cates = $cateModel->getCatesById ($id);
+        if(!$cates){
+            return redirect('admin/cates.index');
+        }else {
+            if ($cates->status ==1 ){
+                $cates->status = 2;
+                $cates->save();
+            }else {
+                $cates->status = 1;
+                $cates->save();
+            }
+        }
+        return response()->json([
+            'success' => 'Record deleted successfully!'
+        ]);
     }
     public function deleteMultiple(Request $request){
         $data = $request->all();

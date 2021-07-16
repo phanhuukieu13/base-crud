@@ -15,21 +15,21 @@ class ProductController extends Controller
     public function index(){
         $productsModel = new Product();
         $products = $productsModel->getProduct();
-        $products = $products->get();
+        $products = $products->paginate(5);
         $cateModel = new Category();
         $viewCate = $cateModel->getCategory();
-        $viewCate = $cateModel->get();
+        $viewCate = $cateModel->paginate(5);
         return view('admin.modules.products.index',compact('products','viewCate'));
     }
     public function create(){
         $cateModel = new Category();
-        $cateName = $cateModel->getCategory()->get();
+        $cateName = $cateModel->getCategory()->paginate(5);
         return view('admin.modules.products.create',compact('cateName'));
     }
     public function search(Request $request){
         $productsModel = new Product();
         $cateModel = new Category();
-        $viewCate = $cateModel->getCategory()->get();
+        $viewCate = $cateModel->getCategory()->paginate(5);
         $products = $productsModel->getProduct();
 
         if(!empty($request['search_category'])) {
@@ -46,7 +46,7 @@ class ProductController extends Controller
             $searchStatus = $request['search_status'];
             $products = $products->where('status','like',"%$searchStatus%");
         }
-        $products  = $products->get();
+        $products  = $products->paginate(5);
         return view('admin.modules.products.index',compact('products','viewCate'));
     }
     public function store(Request $request){
@@ -117,21 +117,27 @@ class ProductController extends Controller
         $data->is_deleted = 1;
         $data->deleted_at = Carbon::now('Asia/Ho_Chi_Minh');
         $data->save();
-        return redirect()->route('admin.pros.index');
+        return response()->json([
+            'success' => 'Record deleted successfully!'
+        ]);
     }
-    public function Active($id){
-        $dataModel = new Product();
-        $data = $dataModel->getProsById ($id);
-        $data->status = 1;
-        $data->save();
-        return redirect()->route('admin.pros.index');
-    }
-    public function DeActive($id){
-        $dataModel = new Product();
-        $data = $dataModel->getProsById ($id);
-        $data->status = 2;
-        $data->save();
-        return redirect()->route('admin.pros.index');
+    public function deActive($id) {
+        $productsModel = new Product();
+        $pros = $productsModel->getProsById($id);
+        if(!$pros){
+            return redirect('admin/pros.index');
+        }else {
+            if ($pros->status ==1 ){
+                $pros->status = 2;
+                $pros->save();
+            }else {
+                $pros->status = 1;
+                $pros->save();
+            }
+        }
+        return response()->json([
+            'success' => 'Record deleted successfully!'
+        ]);
     }
     public function deleteMultiple(Request $request){
         $data = $request->all();

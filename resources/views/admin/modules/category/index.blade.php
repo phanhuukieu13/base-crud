@@ -56,22 +56,9 @@
                                     <th scope="row">{{$i++}}</th>
                                     <td>{{ $item->category_name }}</td>
                                     <td>{{ $item->product()->count() }}</td>
-                                    @if($item->status == 1)
-                                    <form action="{{ route('admin.cates.deActive',['id' => $item->id]) }}" method="post">
-                                        @csrf
                                         <td>
-                                            <button class="label label-inline label-light-primary ">Pending</button>
+                                            <button class="label label-inline label-light-primary submit-pending" data-id= {{ $item->id }} data-status="{{$item->status}}">{{ $item->status==1 ? 'Pending' : 'Rejected' }}</button>
                                         </td>
-                                    </form>
-                                    @elseif($item->status == 2)
-                                    <form action="{{ route('admin.cates.active',['id' => $item->id]) }}" method="post">
-                                        @csrf
-                                        <td>
-                                            <button
-                                                class="label label-lg label-light-danger label-inline">Rejected</button>
-                                        </td>
-                                    </form>
-                                    @endif
                                     <td class="action-button">
                                         <a href="{{ route('admin.cates.edit',['id' => $item->id]) }}"
                                             class="btn btn-icon btn-light btn-hover-primary btn-sm mx-3">
@@ -94,9 +81,7 @@
                                                 <!--end::Svg Icon-->
                                             </span>
                                         </a>
-                                        <form action="{{ route('admin.cates.destroy', ['id' => $item->id]) }}" method="post">
-                                            @csrf
-                                            <button  type="submit" class="btn btn-icon btn-light btn-hover-primary btn-sm"onclick="confirm('Bạn có chắc chắn muốn xóa?')">
+                                            <button  type="submit" class="btn btn-icon btn-light btn-hover-primary btn-sm btn-submit" data-id="{{ $item->id }}">
                                                 <span class="svg-icon svg-icon-md svg-icon-primary">
                                                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px"  height="24px" viewBox="0 0 24 24" version="1.1">
                                                         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -111,12 +96,12 @@
                                                     </svg>
                                                 </span>
                                                 </a>
-                                        </form>
                                     </td>
                                 </tr>
                             </tbody>
                             @endforeach
                         </table>
+                        {{ $cate->links() }}
                         <!--end::Example-->
                     </div>
                 </div>
@@ -181,13 +166,57 @@
                 }  
             }  
         });
-        // $('[data-toggle=confirmation]').confirmation({
-        //     rootSelector: '[data-toggle=confirmation]',
-        //     onConfirm: function (event, element) {
-        //         element.closest('form').submit();
-        //     }
-        // });   
-    
+        $(".btn-submit").click(function (e) {
+            if (confirm('Bạn có chắc chắn muốn xóa?')) {
+                $(this).parents("tr").remove();
+                e.preventDefault()
+                var id = $(this).data("id");
+                $.ajax({
+                    url: "cates/destroy/" + id,
+                    type: 'POST',
+                    data: id,
+                    dataType: 'json',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function(data){
+
+                        }
+                });
+            }
+        });
+        $(".submit-pending").on("click", function () {
+         
+         var currentStatus = $(this).attr("data-status");
+         var id = $(this).attr("data-id");
+         var status = 1;
+         if(currentStatus == 1){
+             status =2;
+         }
+         var text = '';
+         if(status== 1){
+             text = 'Pending'
+         }else {
+             text = 'Rejected'
+         }
+         $.ajax({
+             url: "cates/deActive/" +id,
+             type: 'POST',
+             data: {
+                 'id' :id,
+                 'status' : status
+             },
+             headers: {
+                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
+             },  
+             success: function (data){
+                 console.log(data.success)
+             }
+
+         })
+         $(this).text(text)
+         $(this).attr("data-status", status)
+         });
     });
 </script>
 @endsection

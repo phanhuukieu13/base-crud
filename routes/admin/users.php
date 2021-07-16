@@ -19,7 +19,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.' ,'middleware'=> 'checklogin:
         Route::post('destroy/{id}', 'UserController@destroy')->name('destroy');
         Route::get('/search','UserController@search')->name('search');
         Route::post('deActive/{id}', 'UserController@deActive')->name('deActive');
-        Route::post('active/{id}', 'UserController@active')->name('active');
         Route::post('deleteAll', 'UserController@deleteMultiple')->name('deleteAll');
     });
 

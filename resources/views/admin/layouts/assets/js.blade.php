@@ -13,5 +13,6 @@
 <script src="{{ asset('admin/js/pages/widgets.js') }}"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://unpkg.com/sweetalert2@7.18.0/dist/sweetalert2.all.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!--end::Page Scripts-->
 @yield('script')

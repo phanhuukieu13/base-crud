@@ -17,8 +17,9 @@ class UserController extends Controller
     public function index() {
         $user = new User();
         $getUser = $user->getUser();
-        $getUser = $getUser->get();
-        return view('admin.modules.users.index',compact('getUser'));
+        $getUser = $getUser->paginate(5);
+        return view('admin.modules.users.index', ['getUser' => $getUser]);
+        // return view('admin.modules.users.index',['getUser']=>$getUser);
 
     }
 
@@ -41,7 +42,7 @@ class UserController extends Controller
             $searchStatus = $request['search_status'];
             $getUser = $getUser->where('status','like',"%$searchStatus%");
         }
-        $getUser = $getUser->get();
+        $getUser = $getUser->paginate(5);
         return view('admin.modules.users.index',compact('getUser'));
     }
     public function uploadFile(Request $request){
@@ -167,22 +168,18 @@ class UserController extends Controller
         $user = $userModel->getUserById($id);
         if(!$user){
             return redirect('admin/users.index');
-        }else{
-            $user->status = 2;
-            $user->save();  
+        }else {
+            if ($user->status ==1 ){
+                $user->status = 2;
+                $user->save();
+            }else {
+                $user->status = 1;
+                $user->save();
+            }
         }
-        return redirect()->route('admin.users.index');
-    }
-    public function active($id) {
-        $userModel = new User();
-        $user = $userModel->getUserById($id);
-        if(!$user){
-            return redirect('admin/users.index');
-        }else{
-            $user->status = 1;
-            $user->save();  
-        }
-        return redirect()->route('admin.users.index');
+        return response()->json([
+            'success' => 'Record deleted successfully!'
+        ]);
     }
     public function deleteMultiple(Request $request){
         $data = $request->all();

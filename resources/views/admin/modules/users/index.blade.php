@@ -14,30 +14,38 @@
                     <div class="card-header">
                         <div class="card-title">
                             <h3 class="card-label">Danh sách người dùng</h3>
-                            <form class="col lg-6" action="{{ route('admin.users.search')}}" method="get">
-                                <input value="{{ request()->input('search_name') }}" type="text" class=""
-                                    name="search_name" placeholder="Name" />
-                                <input value="{{ request()->input('phone_number') }}" type="text" class=""
-                                    name="phone_number" placeholder="Số điện thoại" />
-                                <select name="search_status" class="form-control">
-                                    <option value="">Chọn</option>
-                                    @foreach(config('common.status') as $key => $value)
-                                   <option value="{{ $key }}"> {{ $value }}</option>
-                                   @endforeach
-                                </select>
-                                
-                                <button type="submit" class="btn btn-info font-weight-bolder font-size-sm mr-3">Tìm
-                                    kiếm</button>
+
+                        </div>
+                        <div class="card-content m-5">
+                            <form action="{{ route('admin.users.search')}}" method="get">
+                                <div class="row">
+                                    <div class="col">
+                                        <input value="{{ request()->input('search_name') }}" type="text"
+                                            class="form-control" name="search_name" placeholder="Name" />
+                                        <div class="col"><input value="{{ request()->input('phone_number') }}"
+                                                type="text" class="form-control" name="phone_number"
+                                                placeholder="Số điện thoại" /></div>
+                                        <div class="col"><select name="search_status" class="form-control">
+                                                <option value="">Chọn</option>
+                                                @foreach(config('common.status') as $key => $value)
+                                                <option value="{{ $key }}"> {{ $value }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <button type="submit"
+                                            class="btn btn-info font-weight-bolder font-size-sm mr-3">Tìm
+                                            kiếm</button>
+                                    </div>
+                                </div>
                             </form>
                         </div>
-
                         <div class="card-toolbar">
 
                             <a href="{{ route('admin.users.create') }}"
                                 class="btn btn-info font-weight-bolder font-size-sm mr-3">Thêm người dùng</a>
                         </div>
                     </div>
-                    
+
                     <button style="margin: 5px;" class="btn btn-danger btn-xs delete-all" data-url="">Delete
                         All</button>
                     <div class="card-body">
@@ -71,24 +79,13 @@
                                     <td>{{ $u->address }}</td>
                                     <td style="width: 10%;"><img style="width:80%"
                                             src="{{ asset('public/img/' . $u->image) }}" alt=""></td>
-                                    @if($u->status == 1)
-                                    <form action="{{ route('admin.users.deActive',['id' => $u->id]) }}" method="post">
-                                        @csrf
-                                        <td>
-                                            <button class="label label-inline label-light-primary ">Pending</button>
-                                        </td>
-                                    </form>
-                                    @elseif($u->status == 2)
-                                    <form action="{{ route('admin.users.active',['id' => $u->id]) }}" method="post">
-                                        @csrf
-                                        <td>
-                                            <button type="submit" name="submit"
-                                                class="label label-lg label-light-danger label-inline">Rejected</button>
-                                        </td>
-                                    </form>
-                                    @endif
+                                    <td>
+                                        <button class="label label-inline label-light-primary submit-pending"
+                                            data-id="{{ $u->id }}"
+                                            data-status="{{ $u->status }}">{{ $u->status==1 ? 'Pending' : 'Rejected' }}</button>
+                                    </td>
                                     <td class="action-button">
-                                        <a href="{{ route('admin.users.edit',['id' => $u->id]) }}" 
+                                        <a href="{{ route('admin.users.edit',['id' => $u->id]) }}"
                                             class="btn btn-icon btn-light btn-hover-primary btn-sm mx-3">
                                             <span class="svg-icon svg-icon-md svg-icon-primary">
                                                 <svg xmlns="http://www.w3.org/2000/svg"
@@ -109,12 +106,9 @@
                                                 <!--end::Svg Icon-->
                                             </span>
                                         </a>
-                                        <form action="{{ route('admin.users.destroy',['id' => $u->id]) }}"
-                                            method="post">
-                                            @csrf
-                                            <button type="submit"
-                                                class="btn btn-icon btn-light btn-hover-primary btn-sm"
-                                                onclick="confirm('Bạn có chắc chắn muốn xóa?')">
+                                        <a href="">
+                                            <button type="submit" data-id="{{ $u->id }}"
+                                                class="btn btn-icon btn-light btn-hover-primary btn-sm btn-submit">
                                                 <span class="svg-icon svg-icon-md svg-icon-primary">
                                                     <svg xmlns="http://www.w3.org/2000/svg"
                                                         xmlns:xlink="http://www.w3.org/1999/xlink" width="24px"
@@ -131,8 +125,7 @@
                                                         </g>
                                                     </svg>
                                                 </span>
-                                                </a>
-                                        </form>
+                                        </a>
 
                                     </td>
                                 </tr>
@@ -140,6 +133,7 @@
                             @endforeach
                             @endif
                         </table>
+                        {{ $getUser->links() }}
                         <!--end::Example-->
                     </div>
                 </div>
@@ -152,32 +146,29 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 <script type="text/javascript">
     $(document).ready(function () {
-        $('#check_all').on('click', function(e) {
-         if($(this).is(':checked',true))  
-         {
-            $(".checkbox").prop('checked', true);  
-         } else {  
-            $(".checkbox").prop('checked',false);  
-         }  
-        });
-         $('.checkbox').on('click',function(){
-            if($('.checkbox:checked').length == $('.checkbox').length){
-                $('#check_all').prop('checked',true);
-            }else{
-                $('#check_all').prop('checked',false);
+        $('#check_all').on('click', function (e) {
+            if ($(this).is(':checked', true)) {
+                $(".checkbox").prop('checked', true);
+            } else {
+                $(".checkbox").prop('checked', false);
             }
-         });
-        $('.delete-all').on('click', function(e) {
-            var idsArr = [];  
-            $(".checkbox:checked").each(function() {  
+        });
+        $('.checkbox').on('click', function () {
+            if ($('.checkbox:checked').length == $('.checkbox').length) {
+                $('#check_all').prop('checked', true);
+            } else {
+                $('#check_all').prop('checked', false);
+            }
+        });
+        $('.delete-all').on('click', function (e) {
+            var idsArr = [];
+            $(".checkbox:checked").each(function () {
                 idsArr.push($(this).attr('data-id'));
-            });  
-
-            if(idsArr.length <=0)  
-            {  
-                alert("Please select atleast one record to delete.");  
-            }  else {  
-                if(confirm("Ban chac chan muon xoa het tat ca ?")){  
+            });
+            if (idsArr.length <= 0) {
+                alert("Please select atleast one record to delete.");
+            } else {
+                if (confirm("Ban chac chan muon xoa het tat ca ?")) {
                     var strIds = JSON.stringify(idsArr)
                     //  console.log(strIds)
                     //  console.log(JSON.parse(strIds))
@@ -186,11 +177,13 @@
                         type: 'post',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                        data: {'id' : strIds},
+                        },
+                        data: {
+                            'id': strIds
+                        },
                         success: function (data) {
-                            if (data['status']==true) {
-                                $(".checkbox:checked").each(function() {  
+                            if (data['status'] == true) {
+                                $(".checkbox:checked").each(function () {
                                     $(this).parents("tr").remove();
                                 });
                                 alert(data['message']);
@@ -202,35 +195,63 @@
                             alert(data.responseText);
                         }
                     });
-                }  
-            }  
+                }
+            }
         });
-        // $('[data-toggle=confirmation]').confirmation({
-        //     rootSelector: '[data-toggle=confirmation]',
-        //     onConfirm: function (event, element) {
-        //         element.closest('form').submit();
-        //     }
-        // });   
-    
-    });
-    $(".btn").click(function(){
-    var id = $(this).data('id');
 
-   // var $tr = $(this).closest('tr');
-    $.ajax({
-                url: "/admin/user/destroy"+id,
-                dataType: "JSON",
+        $(".btn-submit").click(function (e) {
+            if (confirm('Bạn có chắc chắn muốn xóa?')) {
+                $(this).parents("tr").remove();
+                e.preventDefault()
+                var id = $(this).data("id");
+                $.ajax({
+                    url: "users/destroy/" + id,
+                    type: 'POST',
+                    data: id,
+                    dataType: 'json',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function (data) {
+
+                    }
+                });
+            }
+        });
+
+        $(".submit-pending").on("click", function () {
+            var currentStatus = $(this).attr("data-status") //lay status cu 
+            var id = $(this).attr("data-id") // id status
+            var status = 1
+            if (currentStatus == 1) {
+                status = 2;
+            }
+            var text = '';
+            if (status == 1) {
+                text = 'Pending'
+            } else {
+                text = 'Rejected'
+            }
+            $.ajax({
+                url: "users/deActive/" + id,
                 type: 'POST',
                 data: {
-                    '_token': $('meta[name=csrf-token]').attr("content"),
-                     "id": id
+                    'id': id,
+                    'status': status
                 },
-                success: function ()
-                {
-                    console.log("it Work");
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                success: function (response) {
+                    console.log(response.success)
                 }
-            });
-    console.log("It failed");
-});
+            })
+            $(this).text(text)
+            $(this).attr("data-status", status)
+
+
+        })
+    })
+
 </script>
 @endsection
